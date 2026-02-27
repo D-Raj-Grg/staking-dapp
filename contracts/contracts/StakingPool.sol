@@ -130,9 +130,21 @@ contract StakingPool is ReentrancyGuard, Ownable {
     }
 
     /// @notice Unstake everything and claim rewards in one transaction.
-    function exit() external {
-        unstake(stakedBalance[msg.sender]);
-        claimReward();
+    function exit() external nonReentrant updateReward(msg.sender) {
+        uint256 staked = stakedBalance[msg.sender];
+        if (staked > 0) {
+            stakedBalance[msg.sender] = 0;
+            totalStaked -= staked;
+            stakingToken.safeTransfer(msg.sender, staked);
+            emit Unstaked(msg.sender, staked);
+        }
+
+        uint256 reward = rewards[msg.sender];
+        if (reward > 0) {
+            rewards[msg.sender] = 0;
+            rewardToken.mint(msg.sender, reward);
+            emit RewardClaimed(msg.sender, reward);
+        }
     }
 
     // ──────────────────────────────────────────────────── admin ──
