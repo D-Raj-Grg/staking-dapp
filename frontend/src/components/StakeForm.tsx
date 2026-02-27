@@ -19,7 +19,16 @@ export function StakeForm() {
   const [amount, setAmount] = useState("");
   const { allowance, stkBalance, userStaked, userStakedRaw, refetch } = useStakingPool();
 
-  const { writeContract, data: txHash, isPending } = useWriteContract();
+  const [error, setError] = useState<string | null>(null);
+  const { writeContract, data: txHash, isPending } = useWriteContract({
+    mutation: {
+      onError: (err) => {
+        console.error("writeContract error:", err);
+        setError(err.message.slice(0, 200));
+      },
+      onMutate: () => setError(null),
+    },
+  });
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash: txHash,
     query: {
@@ -144,6 +153,12 @@ export function StakeForm() {
       {txHash && (
         <p className="text-xs text-gray-500 text-center break-all">
           Tx: {txHash}
+        </p>
+      )}
+
+      {error && (
+        <p className="text-xs text-red-400 text-center break-all">
+          Error: {error}
         </p>
       )}
     </div>
