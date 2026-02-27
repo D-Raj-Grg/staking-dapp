@@ -10,6 +10,24 @@ import {
   REWARD_TOKEN_ADDRESS,
 } from "@/lib/contracts";
 
+function formatTokenAmount(v: bigint | undefined): string {
+  if (v === undefined) return "—";
+  const num = parseFloat(formatEther(v));
+  if (num === 0) return "0";
+  if (num < 0.0001) return "< 0.0001";
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
+  return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+}
+
+function formatAPY(basisPoints: bigint | undefined): string {
+  if (basisPoints === undefined) return "—";
+  const pct = Number(basisPoints) / 100;
+  if (pct >= 1_000_000) return `${(pct / 1_000_000).toFixed(1)}M%`;
+  if (pct >= 1_000) return `${(pct / 1_000).toFixed(1)}K%`;
+  return `${pct.toFixed(2)}%`;
+}
+
 export function useStakingPool() {
   const { address } = useAccount();
 
@@ -33,7 +51,7 @@ export function useStakingPool() {
         args: address ? [address, STAKING_POOL_ADDRESS] : undefined,
       },
     ],
-    query: { refetchInterval: 5_000 }, // refresh every 5s so earned ticks up
+    query: { refetchInterval: 5_000 },
   });
 
   const [
@@ -47,21 +65,20 @@ export function useStakingPool() {
     allowance,
   ] = data ?? [];
 
-  const fmt = (v: bigint | undefined) =>
-    v !== undefined ? parseFloat(formatEther(v)).toFixed(4) : "—";
-
   return {
     isLoading,
     refetch,
-    totalStaked: fmt(totalStaked?.result as bigint),
-    apy: apyBP?.result ? `${(Number(apyBP.result as bigint) / 100).toFixed(2)}%` : "—",
-    rewardRate: fmt(rewardRate?.result as bigint),
-    userStaked: fmt(userStaked?.result as bigint),
-    userEarned: fmt(userEarned?.result as bigint),
-    stkBalance: fmt(stkBalance?.result as bigint),
-    rwdBalance: fmt(rwdBalance?.result as bigint),
+    totalStaked: formatTokenAmount(totalStaked?.result as bigint),
+    apy: formatAPY(apyBP?.result as bigint),
+    rewardRate: formatTokenAmount(rewardRate?.result as bigint),
+    userStaked: formatTokenAmount(userStaked?.result as bigint),
+    userEarned: formatTokenAmount(userEarned?.result as bigint),
+    stkBalance: formatTokenAmount(stkBalance?.result as bigint),
+    rwdBalance: formatTokenAmount(rwdBalance?.result as bigint),
     allowance: (allowance?.result as bigint) ?? 0n,
-    // raw values for contract writes
+    // raw values for contract writes & max buttons
+    stkBalanceRaw: (stkBalance?.result as bigint) ?? 0n,
     userStakedRaw: (userStaked?.result as bigint) ?? 0n,
+    userEarnedRaw: (userEarned?.result as bigint) ?? 0n,
   };
 }

@@ -12,28 +12,35 @@ export function StatsDashboard() {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <StatCard
         label="Total Value Locked"
-        value={isLoading ? "…" : `${totalStaked} STK`}
+        value={`${totalStaked} STK`}
+        isLoading={isLoading}
+        accent="brand"
       />
       <StatCard
         label="APY"
-        value={isLoading ? "…" : apy}
+        value={apy}
         sub="Variable — based on total staked"
+        isLoading={isLoading}
+        accent="emerald"
       />
       {address ? (
         <>
           <StatCard
             label="Your Staked"
-            value={isLoading ? "…" : `${userStaked} STK`}
+            value={`${userStaked} STK`}
+            isLoading={isLoading}
+            accent="amber"
           />
           <StatCard
             label="Wallet Balance"
-            value={isLoading ? "…" : `${stkBalance} STK`}
+            value={`${stkBalance} STK`}
+            isLoading={isLoading}
           />
         </>
       ) : (
         <>
-          <StatCard label="Your Staked" value="—" sub="Connect wallet" />
-          <StatCard label="Wallet Balance" value="—" sub="Connect wallet" />
+          <StatCard label="Your Staked" value="—" sub="Connect wallet to view" />
+          <StatCard label="Wallet Balance" value="—" sub="Connect wallet to view" />
         </>
       )}
     </div>
