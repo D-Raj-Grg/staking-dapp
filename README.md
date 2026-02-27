@@ -2,7 +2,7 @@
 
 A DeFi staking protocol built on EVM — stake STK tokens, earn RWD rewards every second.
 
-**Live demo:** _(add your Vercel URL here after deployment)_
+**Live demo:** [staking-dapp-stk.vercel.app](https://staking-dapp-stk.vercel.app/)
 
 ## Tech Stack
 
